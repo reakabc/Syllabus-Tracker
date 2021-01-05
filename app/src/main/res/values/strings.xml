@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Syllabus Tracker</string>
+    <string name="shared_preference">com.abc.reak.syllabustracker.shared_preferences</string>
+    <string name="isFirstTime">1</string>
+</resources>

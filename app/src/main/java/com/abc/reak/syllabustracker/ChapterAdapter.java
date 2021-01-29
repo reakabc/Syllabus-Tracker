@@ -53,10 +53,10 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.myViewHo
                     //mark as done
                     DatabaseHelper helper = new DatabaseHelper(mContext);
                     boolean status = helper.markTheoryAsDone(list.get(position));
-                    Toast.makeText(mContext, status ? "Marked as theory completed!": "Something went wrong!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mContext, status ? "Marked as theory completed!": "Something went wrong!", Toast.LENGTH_SHORT).show();
                 }else{
                     boolean status = databaseHelper.markTheoryAsNotDone(list.get(position));
-                    Toast.makeText(mContext, status ? "Marked as theory completed!": "Something went wrong!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mContext, status ? "Marked as theory completed!": "Something went wrong!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -67,10 +67,10 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.myViewHo
                 if (isChecked){
                     //mark as done
                     boolean status = databaseHelper.markNumericalAsDone(list.get(position));
-                    Toast.makeText(mContext, status ? "Marked as theory completed!": "Something went wrong!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mContext, status ? "Marked as theory completed!": "Something went wrong!", Toast.LENGTH_SHORT).show();
                 }else{
                     boolean status = databaseHelper.markNumericalAsNotDone(list.get(position));
-                    Toast.makeText(mContext, status ? "Marked as theory completed!": "Something went wrong!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mContext, status ? "Marked as theory completed!": "Something went wrong!", Toast.LENGTH_SHORT).show();
                 }
             }
         });

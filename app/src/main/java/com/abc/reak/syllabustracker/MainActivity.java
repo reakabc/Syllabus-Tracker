@@ -3,11 +3,21 @@ package com.abc.reak.syllabustracker;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.eazegraph.lib.charts.PieChart;
+import org.eazegraph.lib.models.PieModel;
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
 
     SharedPreferenceConfig sharedPreferenceConfig;
     DatabaseHelper db;
+
+    ProgressBar pMath, pPhy, pChem, pBio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +46,11 @@ public class MainActivity extends AppCompatActivity {
         chem = findViewById(R.id.chemistry);
         math = findViewById(R.id.maths);
         bio = findViewById(R.id.biology);
+
+        pMath = findViewById(R.id.progress_bar_math);
+        pPhy = findViewById(R.id.progress_bar_phy);
+        pChem = findViewById(R.id.progress_bar_che);
+        pBio = findViewById(R.id.progress_bar_bio);
 
         percentage = findViewById(R.id.percentage);
         percentage_phys = findViewById(R.id.percentage_phy);
@@ -99,26 +116,109 @@ public class MainActivity extends AppCompatActivity {
 
     public void calculate(){
 
-        float[] phy = db.getCompletedPercentage(Subjects.PHYSICS);
-        float[] chem = db.getCompletedPercentage(Subjects.CHEMISTRY);
-        float[] math = db.getCompletedPercentage(Subjects.MATH);
-        float[] bio = db.getCompletedPercentage(Subjects.BIOLOGY);
+        final float[] phy = db.getCompletedPercentage(Subjects.PHYSICS);
+        final float[] chem = db.getCompletedPercentage(Subjects.CHEMISTRY);
+        final float[] math = db.getCompletedPercentage(Subjects.MATH);
+        final float[] bio = db.getCompletedPercentage(Subjects.BIOLOGY);
 
         float ncert = phy[0]+chem[0]+math[0]+bio[0];
         float jee = phy[1]+chem[1]+math[1];
         float neet = phy[2]+chem[2]+(bio[2]/2);
 
         percentage_phys.setText(phy[0]+" / 100");
+        pPhy.setProgress((int) phy[0]);
         percentage_chem.setText(chem[0]+" / 100");
+        pChem.setProgress((int) chem[0]);
         percentage_math.setText(math[0]+" / 100");
+        pMath.setProgress((int) math[0]);
         percentage_bio.setText(bio[0]+" / 100");
+        pBio.setProgress((int) bio[0]);
 
         percentage.setText(Math.round(ncert/4)+" / 100");
+        percentage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPieChart((int) phy[0], (int) chem[0], (int) math[0], (int) bio[0]);
+            }
+        });
         percentage_jee.setText(Math.round(jee/3)+" / 100");
+        percentage_jee.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPieChart((int) phy[1], (int) chem[1], (int) math[1], 0);
+            }
+        });
+
         percentage_neet.setText(Math.round(neet/3)+" / 100");
+        percentage_neet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPieChart(0, (int) phy[2], (int) chem[2], (int) bio[2]);
+            }
+        });
 
-        Toast.makeText(this, String.valueOf(phy[2]), Toast.LENGTH_SHORT).show();
+    }
 
+    private void showPieChart(int a, int b, int c, int d) {
+
+        final android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_pie_chart_status);
+        dialog.setCancelable(true);
+        setData(dialog, a, b, c, d);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+
+        //dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnim;
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+
+        dialog.getWindow().setAttributes(lp);
+        dialog.show();
+
+    }
+
+    private void setData(Dialog dialog, int a, int b, int c, int d)
+    {
+
+        PieChart pieChart = dialog.findViewById(R.id.pie_chart);
+        TextView a_ = dialog.findViewById(R.id.tvMath);
+        TextView b_ = dialog.findViewById(R.id.tvPhy);
+        TextView c_ = dialog.findViewById(R.id.tvChe);
+        TextView d_ = dialog.findViewById(R.id.tvBio);
+
+        // Set the percentage of language used
+        a_.setText(String.valueOf(a));
+        b_.setText(String.valueOf(b));
+        c_.setText(String.valueOf(c));
+        d_.setText(String.valueOf(d));
+
+        // Set the data and color to the pie chart
+        pieChart.addPieSlice(
+                new PieModel(
+                        "Mathematics",
+                        a,
+                        Color.parseColor("#FFA726")));
+        pieChart.addPieSlice(
+                new PieModel(
+                        "Physics",
+                        b,
+                        Color.parseColor("#66BB6A")));
+        pieChart.addPieSlice(
+                new PieModel(
+                        "Chemistry",
+                        c,
+                        Color.parseColor("#EF5350")));
+        pieChart.addPieSlice(
+                new PieModel(
+                        "Biology",
+                        d,
+                        Color.parseColor("#29B6F6")));
+
+        // To animate the pie chart
+        pieChart.startAnimation();
     }
 
     public void firstTimeInitialization(){
